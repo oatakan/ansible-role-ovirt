@@ -1,0 +1,86 @@
+---
+- name: obtain SSO token with using username/password credentials
+  ovirt_auth:
+    url: "{{ lookup('env', 'OVIRT_URL')|default(ovirt.url) }}"
+    username: "{{ lookup('env', 'OVIRT_USERNAME')|default(ovirt.username) }}"
+    password: "{{ lookup('env', 'OVIRT_PASSWORD')|default(ovirt.password) }}"
+    insecure: yes
+
+- name: clone template and customize
+  ovirt_vms:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ item.name }}"
+    template: "{{ item.template }}"
+    cluster: "{{ providers.ovirt.cluster|default('Default') }}"
+    state: running
+    wait: yes
+    memory: "{{ item.memory }}MiB"
+    cpu_sockets: "{{ item.cpu }}"
+    type: server
+    high_availability: true
+    nics:
+      - name: nic1
+        profile_name: "{{ item.networks[0].name }}"
+        network: "{{ item.networks[0].name }}"
+    cloud_init:
+      nic_boot_protocol: static
+      nic_ip_address: "{{ item.networks[0].ip }}"
+      nic_netmask: "{{ item.networks[0].netmask }}"
+      nic_gateway: "{{ item.networks[0].gateway }}"
+      nic_name: eth0
+      nic_on_boot: true
+      host_name: "{{ item.name }}.{{ item.domain }}"
+      dns_servers: "{{ item.dns_servers|join(' ') }}"
+      user_name: "{{ item.user_name }}"
+      root_password: "{{ item.root_password }}"
+  async: 7200
+  poll: 0
+  register: deploy
+  with_items: "{{ nodes }}"
+  when: nodes is defined
+
+- name: wait for instance creation to complete
+  async_status:
+    jid: "{{ item.ansible_job_id }}"
+  register: instances
+  until: instances.finished
+  retries: "{{ instance_wait_retry_limit }}"
+  delay: 10
+  with_items: "{{ deploy.results }}"
+
+- name: create additional disks
+  ovirt_disks:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ item.0.name }}-{{ item.1.name }}"
+    vm_name: "{{ item.0.name }}"
+    size: "{{ item.1.size }}"
+    format: "{{ item.1.format }}"
+    interface: "{{ item.1.interface }}"
+    bootable: "{{ item.1.bootable }}"
+    storage_domain: "{{ item.1.storage_domain }}"
+    state: present
+    wait: yes
+  async: 7200
+  poll: 0
+  register: create_disks
+  with_subelements:
+    - "{{ nodes }}"
+    - disks
+  when: nodes is defined
+
+- name: wait for disk creation to complete
+  async_status:
+    jid: "{{ item.ansible_job_id }}"
+  register: disks_creation
+  until: disks_creation.finished == 0
+  retries: "{{ instance_wait_retry_limit }}"
+  delay: 10
+  with_items: "{{ create_disks.results }}"
+  when: nodes is defined
+
+- name: waiting for servers to come online
+  wait_for:
+    host: "{{ item.networks[0].ip }}"
+    port: "{{ ansible_port | default('22') }}"
+  with_items: "{{ nodes }}"
+  when: (instances | changed) and (nodes is defined)
