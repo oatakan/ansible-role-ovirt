@@ -11,12 +11,12 @@
     auth: "{{ ovirt_auth }}"
     name: "{{ item.name }}"
     template: "{{ item.template }}"
-    cluster: "{{ providers.ovirt.cluster|default('Default') }}"
+    cluster: "{{ providers.ovirt.cluster | default('Default') }}"
     state: running
     wait: yes
     memory: "{{ item.memory }}MiB"
     cpu_sockets: "{{ item.cpu }}"
-    type: server
+    type: "{{ item.type | default('server') }}"
     high_availability: true
     nics:
       - name: nic1
@@ -24,20 +24,56 @@
         network: "{{ item.networks[0].name }}"
     cloud_init:
       nic_boot_protocol: static
-      nic_ip_address: "{{ item.networks[0].ip }}"
-      nic_netmask: "{{ item.networks[0].netmask }}"
-      nic_gateway: "{{ item.networks[0].gateway }}"
+      nic_ip_address: "{{ item.networks[0].ip | default(omit) }}"
+      nic_netmask: "{{ item.networks[0].netmask | default(omit) }}"
+      nic_gateway: "{{ item.networks[0].gateway | default(omit) }}"
       nic_name: eth0
       nic_on_boot: true
       host_name: "{{ item.name }}.{{ item.domain }}"
       dns_servers: "{{ item.dns_servers|join(' ') }}"
       user_name: "{{ item.user_name }}"
-      root_password: "{{ item.root_password }}"
+      root_password: "{{ item.root_password | default(omit) }}"
   async: 7200
   poll: 0
-  register: deploy
+  register: deploy_linux
   with_items: "{{ nodes }}"
-  when: nodes is defined
+  when: nodes is defined and item.sysprep is not defined
+
+- name: clone template and customize
+  ovirt_vms:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ item.name }}"
+    template: "{{ item.template }}"
+    cluster: "{{ providers.ovirt.cluster | default('Default') }}"
+    state: running
+    wait: yes
+    memory: "{{ item.memory }}MiB"
+    cpu_sockets: "{{ item.cpu }}"
+    type: "{{ item.type | default('server') }}"
+    high_availability: true
+    nics:
+      - name: nic1
+        profile_name: "{{ item.networks[0].name }}"
+        network: "{{ item.networks[0].name }}"
+    sysprep:
+      custom_script: "{{ lookup('template', 'templates/unattended.xml.j2') }}"
+      host_name: "{{ item.name }}"
+      domain: "{{ item.domain }}"
+      user_name: "{{ item.user_name | default(ansible_user) }}"
+      root_password: "{{ item.root_password | default(ansible_password) }}"
+  async: 7200
+  poll: 0
+  register: deploy_windows
+  with_items: "{{ nodes }}"
+  when: nodes is defined and item.sysprep is defined
+
+- name: combine deployment results
+  set_fact:
+    deploy_results: "{{ deploy_results|default([]) + [ item ] }}"
+  with_items:
+    - "{{ deploy_linux.results }}"
+    - "{{ deploy_windows.results }}"
+  when: nodes is defined and item.ansible_job_id is defined
 
 - name: wait for instance creation to complete
   async_status:
@@ -46,7 +82,8 @@
   until: instances.finished
   retries: "{{ instance_wait_retry_limit }}"
   delay: 10
-  with_items: "{{ deploy.results }}"
+  with_items: "{{ deploy_results }}"
+  when: nodes is defined and deploy_results is defined and item.ansible_job_id is defined
 
 - name: create additional disks
   ovirt_disks:
@@ -66,7 +103,8 @@
   with_subelements:
     - "{{ nodes }}"
     - disks
-  when: nodes is defined
+    - skip_missing: yes
+  when: nodes is defined and item.0.disks is defined
 
 - name: wait for disk creation to complete
   async_status:
@@ -76,11 +114,30 @@
   retries: "{{ instance_wait_retry_limit }}"
   delay: 10
   with_items: "{{ create_disks.results }}"
-  when: nodes is defined
+  when: nodes is defined and create_disks.results is defined and item.ansible_job_id is defined
 
-- name: waiting for servers to come online
+- name: waiting for ip address to be assigned
+  ovirt_nics_facts:
+    auth: "{{ ovirt_auth }}"
+    vm: "{{ item.vm.name }}"
+    name: nic1
+  register: nics
+  until: nics.ansible_facts.ovirt_nics | length > 0 and nics.ansible_facts.ovirt_nics[0].reported_devices | length > 0 and nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips | length > 0 and nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips[0].address is defined and nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips[0].version == 'v4'
+  retries: 300
+  delay: 10
+  with_items: "{{ instances.results }}"
+  when: nodes is defined and instances.results is defined and item.vm is defined
+
+- name: waiting for servers to come online on predefined ip
   wait_for:
     host: "{{ item.networks[0].ip }}"
-    port: "{{ ansible_port | default('22') }}"
+    port: "{{ item.ansible_port | default(ansible_port) | default('22') }}"
   with_items: "{{ nodes }}"
-  when: (instances | changed) and (nodes is defined)
+  when: nodes is defined and item.networks is defined and item.networks[0].ip is defined
+
+- name: waiting for servers to come online on dhcp ip
+  wait_for:
+    host: "{{ item.ansible_facts.ovirt_nics[0].reported_devices[0].ips[0].address }}"
+    port: "{{ item.ansible_port | default(ansible_port) | default('22') }}"
+  with_items: "{{ nics.results }}"
+  when: nodes is defined and nics.results is defined and item.ansible_facts is defined and (item.item.item.item.networks is defined and item.item.item.item.networks[0].ip is not defined)
