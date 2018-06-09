@@ -6,7 +6,7 @@
     password: "{{ lookup('env', 'OVIRT_PASSWORD')|default(ovirt.password) }}"
     insecure: yes
 
-- name: clone template and customize
+- name: linux - clone template and customize
   ovirt_vms:
     auth: "{{ ovirt_auth }}"
     name: "{{ item.name }}"
@@ -39,7 +39,7 @@
   with_items: "{{ nodes }}"
   when: nodes is defined and item.sysprep is not defined
 
-- name: clone template and customize
+- name: windows - clone template and customize
   ovirt_vms:
     auth: "{{ ovirt_auth }}"
     name: "{{ item.name }}"
