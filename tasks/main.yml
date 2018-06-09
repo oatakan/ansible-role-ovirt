@@ -141,3 +141,25 @@
     port: "{{ item.ansible_port | default(ansible_port) | default('22') }}"
   with_items: "{{ nics.results }}"
   when: nodes is defined and nics.results is defined and item.ansible_facts is defined and (item.item.item.item.networks is defined and item.item.item.item.networks[0].ip is not defined)
+
+- name: waiting for ovirt to show the predefined ip
+  ovirt_nics_facts:
+    auth: "{{ ovirt_auth }}"
+    vm: "{{ item.name }}"
+    name: nic1
+  register: nics
+  until:
+    - nics.ansible_facts.ovirt_nics | length > 0
+    - nics.ansible_facts.ovirt_nics[0].reported_devices | length > 0
+    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips | length > 0
+    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips[0].address is defined
+    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips[0].version == 'v4'
+    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips[0].address == item.networks[0].ip
+  retries: 300
+  delay: 10
+  with_items: "{{ nodes }}"
+  when:
+    - wait_for_static_ip_assigned
+    - nodes is defined
+    - item.networks | length > 0
+    - item.networks[0].ip is defined
