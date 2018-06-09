@@ -24,15 +24,15 @@
         network: "{{ item.networks[0].name }}"
     cloud_init:
       nic_boot_protocol: static
-      nic_ip_address: "{{ item.networks[0].ip | default(omit) }}"
-      nic_netmask: "{{ item.networks[0].netmask | default(omit) }}"
-      nic_gateway: "{{ item.networks[0].gateway | default(omit) }}"
+      nic_ip_address: "{{ item.networks[0].ip | default('') }}"
+      nic_netmask: "{{ item.networks[0].netmask | default('') }}"
+      nic_gateway: "{{ item.networks[0].gateway | default('') }}"
       nic_name: eth0
       nic_on_boot: true
       host_name: "{{ item.name }}.{{ item.domain }}"
       dns_servers: "{{ item.dns_servers|join(' ') }}"
       user_name: "{{ item.user_name }}"
-      root_password: "{{ item.root_password | default(omit) }}"
+      root_password: "{{ item.root_password | default('') }}"
   async: 7200
   poll: 0
   register: deploy_linux
