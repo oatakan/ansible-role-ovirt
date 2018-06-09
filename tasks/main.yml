@@ -57,8 +57,8 @@
         network: "{{ item.networks[0].name }}"
     sysprep:
       custom_script: "{{ lookup('template', 'templates/unattended.xml.j2') }}"
-      host_name: "{{ item.name }}"
-      domain: "{{ item.domain }}"
+      host_name: "{{ item.name | default('') }}"
+      domain: "{{ item.domain | default('') }}"
       user_name: "{{ item.user_name | default(ansible_user) }}"
       root_password: "{{ item.root_password | default(ansible_password) }}"
   async: 7200
