@@ -23,7 +23,7 @@
         profile_name: "{{ item.networks[0].name }}"
         network: "{{ item.networks[0].name }}"
     cloud_init:
-      nic_boot_protocol: "{{ 'static' if item.networks[0].ip is defined and item.networks[0].netmask is defiend and item.networks[0].gateway is defined else 'dhcp' }}"
+      nic_boot_protocol: "{{ 'static' if item.networks[0].ip is defined and item.networks[0].netmask is defined and item.networks[0].gateway is defined else 'dhcp' }}"
       nic_ip_address: "{{ item.networks[0].ip | default('') }}"
       nic_netmask: "{{ item.networks[0].netmask | default('') }}"
       nic_gateway: "{{ item.networks[0].gateway | default('') }}"
