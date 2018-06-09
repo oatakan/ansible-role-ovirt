@@ -29,9 +29,9 @@
       nic_gateway: "{{ item.networks[0].gateway | default('') }}"
       nic_name: eth0
       nic_on_boot: true
-      host_name: "{{ item.name }}.{{ item.domain }}"
-      dns_servers: "{{ item.dns_servers|join(' ') }}"
-      user_name: "{{ item.user_name }}"
+      host_name: "{{ item.name }}.{{ item.domain | default('') }}"
+      dns_servers: "{{ item.dns_servers|join(' ') | default([]) }}"
+      user_name: "{{ item.user_name | default('') }}"
       root_password: "{{ item.root_password | default('') }}"
   async: 7200
   poll: 0
