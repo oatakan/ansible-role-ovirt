@@ -104,7 +104,7 @@
     - "{{ nodes }}"
     - disks
     - skip_missing: yes
-  when: nodes is defined and item.0.disks is defined
+  when: nodes is defined and item.1 is defined
 
 - name: wait for disk creation to complete
   async_status:
