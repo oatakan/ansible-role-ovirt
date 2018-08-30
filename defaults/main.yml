@@ -1,5 +1,7 @@
 ---
-# defaults file for vmware
+
+role_action: provision
+
 ovirt:
   url: ''
   username: ''
