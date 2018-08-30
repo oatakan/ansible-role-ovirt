@@ -55,8 +55,8 @@
 - name: wait for disk deletion to complete
   async_status:
     jid: "{{ item.ansible_job_id }}"
-  register: disks_creation
-  until: disks_creation.finished == 0
+  register: disks_deletion
+  until: disks_deletion.finished == 0
   retries: "{{ instance_wait_retry_limit }}"
   delay: 10
   with_items: "{{ delete_disks.results }}"
@@ -64,3 +64,4 @@
     - nodes is defined
     - delete_disks.results is defined
     - item.ansible_job_id is defined
+    - disks_deletion.finished is defined
