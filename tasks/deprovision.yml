@@ -64,4 +64,5 @@
     - nodes is defined
     - delete_disks.results is defined
     - item.ansible_job_id is defined
+    - disks_deletion is defined
     - disks_deletion.finished is defined
