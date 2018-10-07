@@ -7,7 +7,7 @@
     insecure: yes
 
 - name: linux - clone template and customize
-  ovirt_vms:
+  ovirt_vm:
     auth: "{{ ovirt_auth }}"
     name: "{{ item.name }}"
     template: "{{ item.template }}"
@@ -42,7 +42,7 @@
     - item.sysprep is not defined
 
 - name: windows - clone template and customize
-  ovirt_vms:
+  ovirt_vm:
     auth: "{{ ovirt_auth }}"
     name: "{{ item.name }}"
     template: "{{ item.template }}"
