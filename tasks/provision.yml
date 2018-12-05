@@ -15,6 +15,7 @@
     state: running
     wait: yes
     memory: "{{ item.memory }}MiB"
+    memory_max: "{{ item.memory_max | default(omit) }}{{ 'MiB' if item.memory_max is defined }}"
     cpu_sockets: "{{ item.cpu }}"
     type: "{{ item.type | default('server') }}"
     high_availability: true
@@ -50,6 +51,7 @@
     state: running
     wait: yes
     memory: "{{ item.memory }}MiB"
+    memory_max: "{{ item.memory_max | default(omit) }}{{ 'MiB' if item.memory_max is defined }}"
     cpu_sockets: "{{ item.cpu }}"
     type: "{{ item.type | default('server') }}"
     high_availability: true
