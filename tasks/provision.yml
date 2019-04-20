@@ -134,6 +134,10 @@
     msg: "{{ item }}"
   with_items: "{{ instances.results }}"
 
+- debug:
+    msg: "{{ item.item['app_name'] }}"
+  with_items: "{{ instances.results }}"
+
 - name: assign tags to provisioned vms
   ovirt_tags:
     name: app_name_{{ item.1 }}
