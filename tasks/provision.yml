@@ -132,7 +132,7 @@
 
 - name: assign tags to provisioned vms
   ovirt_tags:
-    name: tag_{{ item.1 }}
+    name: "{{ item.1 }}_{{ item.0.item.item[item.1] }}"
     vms: ["{{ item.0.item.item.name }}"]
   with_nested:
     - "{{ instances.results }}"
