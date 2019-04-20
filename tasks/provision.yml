@@ -135,7 +135,7 @@
   with_items: "{{ instances.results }}"
 
 - debug:
-    msg: "{{ item.item.item['app_name' }}"
+    msg: "{{ item.item.item['app_name'] }}"
   with_items: "{{ instances.results }}"
 
 - name: assign tags to provisioned vms
