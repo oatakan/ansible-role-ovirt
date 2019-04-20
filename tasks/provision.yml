@@ -130,6 +130,23 @@
     - create_disks.results is defined
     - item.ansible_job_id is defined
 
+- debug:
+    msg: "{{ item }}"
+  with_items: "{{ instances.results }}"
+
+- name: assign tags to provisioned vms
+  ovirt_tags:
+    name: app_name_{{ item.1 }}
+    vms: [{{ item.0.item.item.item.name }}]
+  with_nested:
+    - "{{ instances.results }}"
+    - [ 'app_name', 'role' ]
+  when:
+    - nodes is defined
+    - instances.results is defined
+    - item.0.vm is defined
+    - item.0.item.item.item[item.1] is defined
+
 - name: waiting for ip address to be assigned
   ovirt_nic_facts:
     auth: "{{ ovirt_auth }}"
