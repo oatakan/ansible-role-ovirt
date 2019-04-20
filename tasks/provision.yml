@@ -135,13 +135,13 @@
   with_items: "{{ instances.results }}"
 
 - debug:
-    msg: "{{ item.item }}"
+    msg: "{{ item.item.item['app_name' }}"
   with_items: "{{ instances.results }}"
 
 - name: assign tags to provisioned vms
   ovirt_tags:
     name: app_name_{{ item.1 }}
-    vms: ["{{ item.0.item.name }}"]
+    vms: ["{{ item.0.item.item.name }}"]
   with_nested:
     - "{{ instances.results }}"
     - [ 'app_name', 'role' ]
@@ -149,7 +149,7 @@
     - nodes is defined
     - instances.results is defined
     - item.0.vm is defined
-    - item.0.item[item.1] is defined
+    - item.0.item.item[item.1] is defined
 
 - name: waiting for ip address to be assigned
   ovirt_nic_facts:
