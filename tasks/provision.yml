@@ -104,7 +104,7 @@
     interface: "{{ item.1.interface }}"
     bootable: "{{ item.1.bootable }}"
     storage_domain: "{{ item.1.storage_domain }}"
-    state: present
+    state: attached
     wait: yes
   async: 7200
   poll: 0
