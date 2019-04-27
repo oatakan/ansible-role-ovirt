@@ -130,6 +130,9 @@
     - create_disks.results is defined
     - item.ansible_job_id is defined
 
+- debug:
+    var: instances.results
+
 - name: start vms
   ovirt_vm:
     auth: "{{ ovirt_auth }}"
@@ -138,7 +141,7 @@
   async: 7200
   poll: 0
   register: start_vms
-  loop:
+  with_items:
     - "{{ instances.results }}"
   when:
     - nodes is defined
