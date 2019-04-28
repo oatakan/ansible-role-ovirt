@@ -143,7 +143,7 @@
   with_items: "{{ deploy_results }}"
   when:
     - nodes is defined
-    - start_vms is defined
+    - deploy_results is defined
     - item.ansible_job_id is defined
 
 - name: assign tags to provisioned vms
