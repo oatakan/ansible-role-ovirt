@@ -89,7 +89,10 @@
   until: (ovirt_disks is defined) and (ovirt_disks[0].status != "locked")
   retries: 10
   delay: 3
-  with_items: "{{ nodes }}"
+  with_subelements:
+    - "{{ nodes }}"
+    - disks
+    - skip_missing: yes
   when:
     - nodes is defined
     - disks_creation.results is defined
