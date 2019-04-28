@@ -80,19 +80,20 @@
     - item.ansible_job_id is defined
 
 - debug:
-    var: disks_creation.results
+    var: create_disks.results
 
 - name: wait until the image is unlocked by the oVirt engine
   ovirt_disk_facts:
     auth: "{{ ovirt_auth }}"
-    pattern: "id={{ item.id }}"
+    pattern: "name={% if item.1.name_prefix | default(true) %}{{ item.0.name }}_{% endif %}{{ item.1.name }}"
   until: (ovirt_disks is defined) and (ovirt_disks[0].status != "locked")
   retries: 10
   delay: 3
-  with_items: "{{ disks_creation.results }}"
+  with_items: "{{ nodes }}"
   when:
     - nodes is defined
     - disks_creation.results is defined
+    - item.1 is defined
 
 #- name: wait for disk to finish initializing
 #  pause:
