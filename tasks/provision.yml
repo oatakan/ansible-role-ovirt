@@ -98,9 +98,9 @@
     - disks_creation.results is defined
     - item.1 is defined
 
-#- name: wait for disk to finish initializing
-#  pause:
-#    seconds: 5
+- name: wait for disk to finish initializing
+  pause:
+    seconds: 5
 
 #- debug:
 #    var: deployed_instances.results
