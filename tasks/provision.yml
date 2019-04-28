@@ -82,8 +82,17 @@
 - debug:
     var: deployed_instances.results
 
-- pause:
-    seconds: 60
+- name: get vm info
+  ovirt_vms_facts:
+    auth: "{{ ovirt_auth }}"
+    pattern: id="{{ item.id }}"
+    fetch_nested: true
+    nested_attributes: disk
+  register: vms_status
+  with_items: "{{ deployed_instances.results }}"
+
+- debug:
+    var: vms_status.results
 
 - name: linux - start and customize
   ovirt_vm:
