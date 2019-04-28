@@ -58,17 +58,11 @@
                     <Order>3</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c powershell -Command "Resize-Partition -DriveLetter C -Size (Get-PartitionSupportedSize -DriveLetter C).Sizemax"</CommandLine>
-                    <Description>Extend OS disk</Description>
-                    <Order>4</Order>
-                    <RequiresUserInput>true</RequiresUserInput>
-                </SynchronousCommand>
 {% if item.networks[0].ip is defined and item.networks[0].netmask is defined and item.networks[0].gateway is defined %}
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>cmd.exe /c netsh interface ip set address name="Ethernet" static {{ item.networks[0].ip }} {{ item.networks[0].netmask }} {{ item.networks[0].gateway }}</CommandLine>
                     <Description>Set static ip</Description>
-                    <Order>5</Order>
+                    <Order>4</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
 {% if item.networks[0].dns_servers is defined %}
@@ -76,7 +70,7 @@
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>cmd.exe /c netsh interface ip add dns name="Ethernet" {{ dns_server }} index={{ 1 + loop.index }}</CommandLine>
                     <Description>Set static ip</Description>
-                    <Order>{{ 6 + loop.index }}</Order>
+                    <Order>{{ 5 + loop.index }}</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
 {% endfor %}
@@ -100,6 +94,12 @@
             <SkipAutoActivation>true</SkipAutoActivation>
         </component>
         <component name="Microsoft-Windows-Deployment" processorArchitecture="x86" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <runsynchronous>
+                <runsynchronouscommand wcm:action="add">
+                    <order>1</order>
+                    <path>cmd.exe /c powershell -Command "Resize-Partition -DriveLetter C -Size (Get-PartitionSupportedSize -DriveLetter C).Sizemax"</path>
+                </runsynchronouscommand>
+            </runsynchronous>
             <ExtendOSPartition>
                 <Extend>true</Extend>
             </ExtendOSPartition>
