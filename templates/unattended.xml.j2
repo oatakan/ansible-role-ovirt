@@ -94,6 +94,12 @@
             <SkipAutoActivation>true</SkipAutoActivation>
         </component>
         <component name="Microsoft-Windows-Deployment" processorArchitecture="x86" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <runsynchronous>
+                <runsynchronouscommand wcm:action="add">
+                    <order>1</order>
+                    <path>Resize-Partition -DriveLetter C -Size (Get-PartitionSupportedSize -DriveLetter C).Sizemax</path>
+                </runsynchronouscommand>
+            </runsynchronous>
             <ExtendOSPartition>
                 <Extend>true</Extend>
             </ExtendOSPartition>
