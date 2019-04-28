@@ -82,6 +82,9 @@
 - debug:
     var: deployed_instances.results
 
+- pause:
+    seconds: 60
+
 - name: linux - start and customize
   ovirt_vm:
     auth: "{{ ovirt_auth }}"
