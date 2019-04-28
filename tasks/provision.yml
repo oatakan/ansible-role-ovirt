@@ -79,6 +79,10 @@
     - create_disks.results is defined
     - item.ansible_job_id is defined
 
+- name: wait for disk to finish initializing
+  pause:
+    seconds: 5
+
 #- debug:
 #    var: deployed_instances.results
 #
