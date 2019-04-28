@@ -59,7 +59,7 @@
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
-                    <CommandLine>Resize-Partition -DriveLetter C -Size (Get-PartitionSupportedSize -DriveLetter C).Sizemax</CommandLine>
+                    <CommandLine>cmd.exe /c powershell -Command "Resize-Partition -DriveLetter C -Size (Get-PartitionSupportedSize -DriveLetter C).Sizemax"</CommandLine>
                     <Description>Extend OS disk</Description>
                     <Order>4</Order>
                     <RequiresUserInput>true</RequiresUserInput>
