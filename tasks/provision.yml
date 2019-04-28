@@ -42,6 +42,46 @@
     - nodes is defined
     - item.sysprep is not defined
 
+
+
+
+
+- name: linux - clone template and customize
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ item.name }}"
+    template: "{{ item.template }}"
+    cluster: "{{ providers.ovirt.cluster | default('Default') }}"
+    state: present
+    wait: yes
+    memory: "{{ item.memory }}MiB"
+    memory_max: "{{ ((item.memory_max | string) + 'MiB') if item.memory_max is defined else omit }}"
+    cpu_sockets: "{{ item.cpu }}"
+    type: "{{ item.type | default('server') }}"
+    high_availability: true
+    nics:
+      - name: nic1
+        profile_name: "{{ item.networks[0].name }}"
+        network: "{{ item.networks[0].name }}"
+    cloud_init:
+      nic_boot_protocol: "{{ 'static' if item.networks[0].ip is defined and item.networks[0].netmask is defined and item.networks[0].gateway is defined else 'dhcp' }}"
+      nic_ip_address: "{{ item.networks[0].ip | default('') }}"
+      nic_netmask: "{{ item.networks[0].netmask | default('') }}"
+      nic_gateway: "{{ item.networks[0].gateway | default('') }}"
+      nic_name: eth0
+      nic_on_boot: true
+      host_name: "{{ item.name }}.{{ item.domain | default('') }}"
+      dns_servers: "{{ item.dns_servers|join(' ') | default([]) }}"
+      user_name: "{{ item.user_name | default('') }}"
+      root_password: "{{ item.root_password | default('') }}"
+  async: 7200
+  poll: 0
+  register: deploy_linux
+  with_items: "{{ nodes }}"
+  when:
+    - nodes is defined
+    - item.sysprep is not defined
+
 - name: windows - clone template and customize
   ovirt_vm:
     auth: "{{ ovirt_auth }}"
