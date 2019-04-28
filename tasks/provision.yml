@@ -98,9 +98,12 @@
     - disks_creation.results is defined
     - item.1 is defined
 
+- debug:
+    var: ovirt_disks
+
 - name: wait for disk to finish initializing
   pause:
-    seconds: 5
+    seconds: 30
 
 - name: linux - start and customize
   ovirt_vm:
