@@ -66,6 +66,9 @@
     - nodes is defined
     - item.1 is defined
 
+- debug:
+    var: create_disks
+
 - name: wait for disk creation to complete
   async_status:
     jid: "{{ item.ansible_job_id }}"
