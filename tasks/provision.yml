@@ -73,7 +73,7 @@
   async_status:
     jid: "{{ item.ansible_job_id }}"
   register: disks_creation
-  until: item.finished == 0
+  until: disks_creation.finished == 0
   retries: "{{ instance_wait_retry_limit }}"
   delay: 10
   with_items: "{{ create_disks.results }}"
@@ -81,6 +81,7 @@
     - nodes is defined
     - create_disks.results is defined
     - item.ansible_job_id is defined
+    - create_disks.finished != 0
 
 - debug:
     var: create_disks.results
@@ -88,7 +89,7 @@
 - name: wait until the image is unlocked by the oVirt engine
   ovirt_disk_facts:
     auth: "{{ ovirt_auth }}"
-    pattern: "name={% if item.1.name_prefix | default(true) %}{{ item.0.name }}_{% endif %}{{ item.1.name }} and vm_name={{ item.0.name }}"
+    pattern: "name={% if item.1.name_prefix | default(true) %}{{ item.0.name }}_{% endif %}{{ item.1.name }}"
   until: (ovirt_disks is defined) and (ovirt_disks | length > 0) and (ovirt_disks[0].status != "locked")
   retries: 10
   delay: 3
