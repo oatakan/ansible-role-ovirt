@@ -67,7 +67,7 @@
     - item.1 is defined
 
 - debug:
-    var: create_disks
+    var: create_disks.results.finished
 
 - name: wait for disk creation to complete
   async_status:
