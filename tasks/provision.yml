@@ -90,7 +90,7 @@
   ovirt_disk_facts:
     auth: "{{ ovirt_auth }}"
     pattern: "name={% if item.1.name_prefix | default(true) %}{{ item.0.name }}_{% endif %}{{ item.1.name }} and vm_name={{ item.0.name }}"
-  until: (ovirt_disks is defined) and (ovirt_disks[0].status != "locked")
+  until: (ovirt_disks is defined) and (ovirt_disks | length > 0) and (ovirt_disks[0].status != "locked")
   retries: 10
   delay: 3
   with_subelements:
