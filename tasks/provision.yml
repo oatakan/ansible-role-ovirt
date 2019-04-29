@@ -93,7 +93,7 @@
   retries: 10
   delay: 3
   with_subelements:
-    - "{{ disks_creation.results }}"
+    - "{{ nodes }}"
     - disks
     - skip_missing: yes
   when:
