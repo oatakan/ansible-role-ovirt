@@ -66,9 +66,6 @@
     - nodes is defined
     - item.1 is defined
 
-- debug:
-    var: create_disks.results
-
 - name: wait for disk creation to complete
   async_status:
     jid: "{{ item.ansible_job_id }}"
@@ -81,9 +78,6 @@
     - nodes is defined
     - create_disks.results is defined
     - item.ansible_job_id is defined
-
-- debug:
-    var: disks_creation.results
 
 - name: wait until the image is unlocked by the oVirt engine
   ovirt_disk_facts:
@@ -100,9 +94,6 @@
     - nodes is defined
     - disks_creation.results is defined
     - item.1 is defined
-
-- debug:
-    var: ovirt_disks
 
 - name: wait for disk to finish initializing
   pause:
