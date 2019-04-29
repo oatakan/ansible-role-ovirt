@@ -81,7 +81,6 @@
     - nodes is defined
     - create_disks.results is defined
     - item.ansible_job_id is defined
-    - create_disks.results.finished != 0
 
 - debug:
     var: disks_creation.results
