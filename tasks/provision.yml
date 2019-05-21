@@ -103,7 +103,7 @@
 
 - name: wait for disk to finish initializing
   pause:
-    seconds: 30
+    seconds: 60
   when: ovirt_disks is defined
 
 - name: linux - start and customize
