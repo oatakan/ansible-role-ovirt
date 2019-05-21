@@ -244,7 +244,7 @@
   delay: 10
   with_items: "{{ nodes }}"
   when:
-    - wait_for_static_ip_assigned
+    - wait_for_static_ip_assigned|bool
     - nodes is defined
     - item.networks | length > 0
     - item.networks[0].ip is defined
