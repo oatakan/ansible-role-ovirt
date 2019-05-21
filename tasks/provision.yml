@@ -19,6 +19,7 @@
     cpu_sockets: "{{ item.cpu }}"
     graphical_console: "{{ item.graphical_console | default(omit) }}"
     host_devices: "{{ item.host_devices | default(omit) }}"
+    placement_policy: "{{ item.placement_policy | default(omit) }}"
     type: "{{ item.type | default('server') }}"
     high_availability: true
     nics:
