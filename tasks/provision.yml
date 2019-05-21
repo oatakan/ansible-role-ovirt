@@ -59,6 +59,7 @@
     interface: "{{ item.1.interface | default(omit) }}"
     bootable: "{{ item.1.bootable | default(omit) }}"
     storage_domain: "{{ item.1.storage_domain | default(omit) }}"
+    activate: yes
     state: present
     wait: yes
   async: 7200
@@ -103,7 +104,7 @@
 
 - name: wait for disk to finish initializing
   pause:
-    seconds: 60
+    seconds: 30
   when: ovirt_disks is defined
 
 - name: linux - start and customize
