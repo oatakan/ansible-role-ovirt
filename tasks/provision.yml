@@ -17,6 +17,8 @@
     memory: "{{ item.memory }}MiB"
     memory_max: "{{ ((item.memory_max | string) + 'MiB') if item.memory_max is defined else omit }}"
     cpu_sockets: "{{ item.cpu }}"
+    graphical_console: "{{ item.graphical_console | default(omit) }}"
+    host_devices: "{{ item.host_devices | default(omit) }}"
     type: "{{ item.type | default('server') }}"
     high_availability: true
     nics:
