@@ -10,7 +10,7 @@
   ovirt_vm:
     auth: "{{ ovirt_auth }}"
     name: "{{ item.name }}"
-    template: "{{ item.template }}"
+#    template: "{{ item.template }}"
     cluster: "{{ providers.ovirt.cluster | default('Default') }}"
     state: absent
     wait: yes
