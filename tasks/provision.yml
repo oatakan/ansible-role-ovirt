@@ -271,7 +271,7 @@
     - item.item.item.item.networks is defined
     - item.item.item.item.networks[0].ip is not defined
 
- name: waiting for servers to come online on dhcp ip
+- name: waiting for servers to come online on dhcp ip
   wait_for:
     host: "{{ item.ovirt_nics[0].reported_devices[0].ips[0].address }}"
     port: "{{ item.item.item.item.ansible_port | default(ansible_port) | default('22') }}"
