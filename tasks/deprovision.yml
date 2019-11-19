@@ -37,7 +37,7 @@
     vm_name: "{{ item.0.name }}"
     storage_domain: "{{ item.1.storage_domain | default(omit) }}"
     state: absent
-    wait: yes
+    wait: no
   async: 7200
   poll: 0
   register: delete_disks
