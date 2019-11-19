@@ -28,36 +28,36 @@
     - undeploy.results is defined
     - item.ansible_job_id is defined
 
-- name: delete additional disks
-  ovirt_disk:
-    auth: "{{ ovirt_auth }}"
-    name: "{% if item.1.name_prefix | default(true) %}{{ item.0.name }}_{% endif %}{{ item.1.name }}"
-    vm_name: "{{ item.0.name }}"
-    storage_domain: "{{ item.1.storage_domain | default(omit) }}"
-    state: absent
-    wait: no
-  async: 7200
-  poll: 0
-  register: delete_disks
-  with_subelements:
-    - "{{ nodes | json_query(query) }}"
-    - disks
-    - skip_missing: yes
-  when:
-    - nodes is defined
-    - item.1 is defined
-  vars:
-    query: "@[?contains(`{{ ansible_play_hosts }}`, name)]"
-
-- name: wait for disk deletion to complete
-  async_status:
-    jid: "{{ item.ansible_job_id }}"
-  register: disks_deletion
-  until: disks_deletion.finished
-  retries: "{{ instance_wait_retry_limit }}"
-  delay: 10
-  with_items: "{{ delete_disks.results }}"
-  when:
-    - nodes is defined
-    - delete_disks.results is defined
-    - item.ansible_job_id is defined
+#- name: delete additional disks
+#  ovirt_disk:
+#    auth: "{{ ovirt_auth }}"
+#    name: "{% if item.1.name_prefix | default(true) %}{{ item.0.name }}_{% endif %}{{ item.1.name }}"
+#    vm_name: "{{ item.0.name }}"
+#    storage_domain: "{{ item.1.storage_domain | default(omit) }}"
+#    state: absent
+#    wait: no
+#  async: 7200
+#  poll: 0
+#  register: delete_disks
+#  with_subelements:
+#    - "{{ nodes | json_query(query) }}"
+#    - disks
+#    - skip_missing: yes
+#  when:
+#    - nodes is defined
+#    - item.1 is defined
+#  vars:
+#    query: "@[?contains(`{{ ansible_play_hosts }}`, name)]"
+#
+#- name: wait for disk deletion to complete
+#  async_status:
+#    jid: "{{ item.ansible_job_id }}"
+#  register: disks_deletion
+#  until: disks_deletion.finished
+#  retries: "{{ instance_wait_retry_limit }}"
+#  delay: 10
+#  with_items: "{{ delete_disks.results }}"
+#  when:
+#    - nodes is defined
+#    - delete_disks.results is defined
+#    - item.ansible_job_id is defined
