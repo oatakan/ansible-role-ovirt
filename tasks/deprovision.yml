@@ -9,7 +9,7 @@
     wait: yes
   async: 7200
   poll: 0
-  register: vms_remove
+  register: undeploy
   loop: "{{ ansible_play_hosts | intersect(nodes | map(attribute='name') | list) }}"
   when:
     - nodes is defined
@@ -24,10 +24,10 @@
     - vm_remove.finished == 0
   retries: "{{ instance_wait_retry_limit }}"
   delay: 10
-  loop: "{{ vms_remove.results }}"
+  loop: "{{ undeploy.results }}"
   when:
     - nodes is defined
-    - vms_remove.results is defined
+    - undeploy.results is defined
     - item.ansible_job_id is defined
 
 - name: delete additional disks

@@ -12,6 +12,7 @@
       when: role_action == 'provision'
 
     - include_tasks: deprovision.yml
+      run_once: yes
       when: role_action == 'deprovision'
   always:
     - name: revoke the SSO token
