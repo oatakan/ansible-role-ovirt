@@ -1,33 +1,5 @@
 ---
 
-#- name: stop vms
-#  ovirt_vm:
-#    auth: "{{ ovirt_auth }}"
-#    name: "{{ item }}"
-#    cluster: "{{ providers.ovirt.cluster | default('Default') }}"
-#    state: stopped
-#    wait: yes
-#  async: 7200
-#  poll: 0
-#  register: vms_stop
-#  loop: "{{ ansible_play_hosts | intersect(nodes | map(attribute='name') | list) }}"
-#  when:
-#    - nodes is defined
-#    - hostvars[item].name is defined
-#
-#- name: wait for vms to be stopped
-#  async_status:
-#    jid: "{{ item.ansible_job_id }}"
-#  register: vm_stop
-#  until: vm_stop.finished
-#  retries: "{{ instance_wait_retry_limit }}"
-#  delay: 10
-#  loop: "{{ vms_stop.results }}"
-#  when:
-#    - nodes is defined
-#    - vms_stop.results is defined
-#    - item.ansible_job_id is defined
-
 - name: remove vms
   ovirt_vm:
     auth: "{{ ovirt_auth }}"
@@ -81,9 +53,7 @@
   async_status:
     jid: "{{ item.ansible_job_id }}"
   register: disks_deletion
-  until:
-    - disks_deletion.finished is defined
-    - disks_deletion.finished == 0 or disks_deletion.finished == 1
+  until: disks_deletion.finished
   retries: "{{ instance_wait_retry_limit }}"
   delay: 10
   with_items: "{{ delete_disks.results }}"
