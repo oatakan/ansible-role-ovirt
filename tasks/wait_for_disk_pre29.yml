@@ -12,7 +12,6 @@
     - disks
     - skip_missing: yes
   when:
-    - ansible_version.full is version('2.9', '<')
     - nodes is defined
     - disks_creation.results is defined
     - item.1 is defined
