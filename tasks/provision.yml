@@ -1,10 +1,4 @@
 ---
-- name: obtain SSO token with using username/password credentials
-  ovirt_auth:
-    url: "{{ lookup('env', 'OVIRT_URL')|default(ovirt.url) }}"
-    username: "{{ lookup('env', 'OVIRT_USERNAME')|default(ovirt.username) }}"
-    password: "{{ lookup('env', 'OVIRT_PASSWORD')|default(ovirt.password) }}"
-    insecure: yes
 
 - name: clone from template
   ovirt_vm:
