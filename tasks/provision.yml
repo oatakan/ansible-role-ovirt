@@ -87,11 +87,6 @@
 - include_tasks: wait_for_disk.yml
   when: ansible_version.full is version('2.9', '>=')
 
-#- name: wait for disk to finish initializing
-#  pause:
-#    seconds: 30
-#  when: ovirt_disk_info is defined
-
 - name: linux - start and customize
   ovirt_vm:
     auth: "{{ ovirt_auth }}"
