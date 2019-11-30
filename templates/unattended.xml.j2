@@ -155,7 +155,7 @@
 {% if item.networks is defined and item.networks[0].ip is defined and item.networks[0].gateway is defined and item.networks[0].netmask is defined %}
 {% if not '2008' in (windows_distro_name | default(item.template)) %}
                 <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c powershell -Command "New-NetIPAddress –IPAddress {{ item.networks[0].ip }} -DefaultGateway {{ item.networks[0].gateway }} -PrefixLength {{ (item.networks[0].ip + '/' + item.networks[0].netmask) | ipaddr('prefix') }} -InterfaceIndex (Get-NetAdapter).InterfaceIndex"</CommandLine>
+                    <CommandLine>cmd.exe /c powershell -Command "New-NetIPAddress –IPAddress {{ item.networks[0].ip }} -DefaultGateway {{ item.networks[0].gateway }} -PrefixLength {{ (item.networks[0].ip + '/' + item.networks[0].netmask) | ipaddr('prefix') }} -InterfaceIndex (Get-NetAdapter | Where-Object { ($_.Name -like '*Ethernet*') -and ($_.Status -like 'Up') })[0].InterfaceIndex"</CommandLine>
                     <Description>Set static ip</Description>
                     <Order>50</Order>
                     <RequiresUserInput>true</RequiresUserInput>
@@ -171,7 +171,7 @@
 {% if item.networks[0].dns_servers is defined %}
 {% if not '2008' in (windows_distro_name | default(item.template)) %}
                 <SynchronousCommand wcm:action="add">
-                    <CommandLine>cmd.exe /c powershell -Command "Set-DNSClientServerAddress –InterfaceIndex (Get-NetAdapter).InterfaceIndex –ServerAddresses {{ item.networks[0].dns_servers|join(',') }}"</CommandLine>
+                    <CommandLine>cmd.exe /c powershell -Command "Set-DNSClientServerAddress –InterfaceIndex (Get-NetAdapter | Where-Object { ($_.Name -like '*Ethernet*') -and ($_.Status -like 'Up') })[0].InterfaceIndex –ServerAddresses {{ item.networks[0].dns_servers|join(',') }}"</CommandLine>
                     <Description>Set static ip</Description>
                     <Order>51</Order>
                     <RequiresUserInput>true</RequiresUserInput>
