@@ -10,8 +10,11 @@
     wait: yes
     memory: "{{ item.memory }}MiB"
     memory_max: "{{ ((item.memory_max | string) + 'MiB') if item.memory_max is defined else omit }}"
+    memory_guaranteed: "{{ ((item.memory_guaranteed | string) + 'MiB') if item.memory_guaranteed is defined else omit }}"
     cpu_mode: "{{ item.cpu_mode | default(omit) }}"
+    cpu_cores: "{{ item.cpu_cores | default(omit) }}"
     cpu_sockets: "{{ item.cpu }}"
+    cpu_threads: "{{ item.cpu_threads | default(omit) }}"
     ballooning_enabled: "{{ item.ballooning_enabled | default(omit) }}"
     graphical_console: "{{ item.graphical_console | default(omit) }}"
     host: "{{ item.host | default(omit) }}"
