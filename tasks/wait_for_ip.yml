@@ -9,6 +9,7 @@
   until:
     - nics.ovirt_nics | length > 0
     - nics.ovirt_nics[0].reported_devices | length > 0
+    - nics.ovirt_nics[0].reported_devices[0].ips is defined
     - nics.ovirt_nics[0].reported_devices[0].ips | length > 0
     - nics.ovirt_nics[0].reported_devices[0].ips[0].address is defined
     - nics.ovirt_nics[0].reported_devices[0].ips[0].version == 'v4'
