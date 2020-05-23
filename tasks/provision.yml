@@ -24,7 +24,7 @@
     high_availability: true
     nics:
       - name: nic1
-        profile_name: "{{ item.networks[0].name }}"
+        profile_name: "{{ item.networks[0].profile_name | default(item.networks[0].name) }}"
         network: "{{ item.networks[0].name }}"
     custom_properties: "{{ item.custom_properties | default(omit) }}"
   async: 7200
