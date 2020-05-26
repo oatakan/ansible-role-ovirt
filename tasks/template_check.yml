@@ -45,6 +45,7 @@
 - name: set iso file
   set_fact:
     node_iso_file: '{{ node_iso_file | default({}) | combine({node.name: ovirt_disk_main_iso.ovirt_disks[0].id | default(node.cd_iso) | default(None)}) }}'
+  when: (node_iso_file[node.name] | default(None)) is undefined
 
 - name: set os type
   set_fact:
