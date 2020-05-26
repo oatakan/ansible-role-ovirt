@@ -14,7 +14,7 @@
 - name: fail if datacenter is not found
   fail:
     msg: "data center is not found"
-  when: datacenter_info | length > 0
+  when: datacenter_info.ovirt_datacenters | length == 0
 
 - name: get storage information
   ovirt_storage_domain_info:
