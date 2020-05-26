@@ -1,10 +1,12 @@
 ---
 
+- include_tasks: preflight_check.yml
+
 - name: clone from template
   ovirt_vm:
     auth: "{{ ovirt_auth }}"
     name: "{{ item.name }}"
-    template: "{{ item.template }}"
+    template: "{{ item.template | default(omit) }}"
     cluster: "{{ providers.ovirt.cluster | default('Default') }}"
     state: present
     wait: yes
@@ -15,6 +17,7 @@
     cpu_cores: "{{ item.cpu_cores | default(omit) }}"
     cpu_sockets: "{{ item.cpu }}"
     cpu_threads: "{{ item.cpu_threads | default(omit) }}"
+    cd_iso: "{{ node_iso_file[item] | default(omit) }}"
     ballooning_enabled: "{{ item.ballooning_enabled | default(omit) }}"
     graphical_console: "{{ item.graphical_console | default(omit) }}"
     host: "{{ item.host | default(omit) }}"
@@ -30,7 +33,7 @@
   async: 7200
   poll: 0
   register: deploy
-  with_items: "{{ nodes }}"
+  loop: "{{ nodes }}"
   when:
     - nodes is defined
 
@@ -110,7 +113,7 @@
   async: 7200
   poll: 0
   register: deploy_linux
-  with_items: "{{ nodes }}"
+  loop: "{{ nodes }}"
   when:
     - nodes is defined
     - item.sysprep is not defined
@@ -129,7 +132,7 @@
   async: 7200
   poll: 0
   register: deploy_windows
-  with_items: "{{ nodes }}"
+  loop: "{{ nodes }}"
   when:
     - nodes is defined
     - item.sysprep is defined
