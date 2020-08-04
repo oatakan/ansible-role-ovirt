@@ -104,7 +104,7 @@
       nic_ip_address: "{{ item.networks[0].ip | default('') }}"
       nic_netmask: "{{ item.networks[0].netmask | default('') }}"
       nic_gateway: "{{ item.networks[0].gateway | default('') }}"
-      nic_name: "{{ item.networks[0].device_name | default('eth0') }}"
+      nic_name: "{{ item.networks[0].nic_name | default(item.networks[0].device_name) | default('eth0') }}"
       nic_on_boot: true
       host_name: "{{ item.name }}.{{ item.domain | default('') }}"
       dns_servers: "{{ item.dns_servers|join(' ') | default([]) }}"
