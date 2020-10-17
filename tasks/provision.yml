@@ -63,7 +63,7 @@
     bootable: "{{ item.1.bootable | default(omit) }}"
     storage_domain: "{{ item.1.storage_domain | default(omit) }}"
     activate: yes
-    state: attached
+    state: present
     wait: yes
   async: 7200
   poll: 0
