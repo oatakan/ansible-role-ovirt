@@ -24,6 +24,7 @@
     host: "{{ item.host | default(omit) }}"
     host_devices: "{{ item.host_devices | default(omit) }}"
     placement_policy: "{{ item.placement_policy | default(omit) }}"
+    storage_domain: "{{ item.storage_domain | default(omit) }}"
     type: "{{ item.type | default('server') }}"
     high_availability: true
     nics:
