@@ -5,7 +5,7 @@
     auth: "{{ ovirt_auth }}"
     name: "{{ item }}"
     cluster: "{{ providers.ovirt.cluster | default('Default') }}"
-    storage_domain: "{{ item.1.storage_domain | default(omit) }}"
+    storage_domain: "{{ item.storage_domain | default(omit) }}"
     state: absent
     wait: yes
   async: 7200
