@@ -6,6 +6,11 @@
     vm: "{{ item.vm.name }}"
     name: nic1
   register: nics_info
+  with_items: "{{ instances.results }}"
+  when:
+    - nodes is defined
+    - instances.results is defined
+    - item.vm is defined
 
 - debug:
     msg: "{{ nics_info }}"
