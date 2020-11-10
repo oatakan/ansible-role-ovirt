@@ -1,5 +1,15 @@
 ---
 
+- name: check ips assigned
+  ovirt_nic_info:
+    auth: "{{ ovirt_auth }}"
+    vm: "{{ item.vm.name }}"
+    name: nic1
+  register: nics_info
+
+- debug:
+    msg: "{{ nics_info }}"
+
 - name: waiting for ip address to be assigned
   ovirt_nic_info:
     auth: "{{ ovirt_auth }}"
