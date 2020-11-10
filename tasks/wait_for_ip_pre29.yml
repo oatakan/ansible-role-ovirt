@@ -1,25 +1,25 @@
 ---
 
-- name: waiting for ip address to be assigned (<2.9)
-  ovirt_nic_facts:
-    auth: "{{ ovirt_auth }}"
-    vm: "{{ item.vm.name }}"
-    name: nic1
-  register: nics
-  until:
-    - nics.ansible_facts.ovirt_nics | length > 0
-    - nics.ansible_facts.ovirt_nics[0].reported_devices | length > 0
-    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips is defined
-    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips | length > 0
-    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips[0].address is defined
-    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips[0].version == 'v4'
-  retries: 300
-  delay: 10
-  with_items: "{{ instances.results }}"
-  when:
-    - nodes is defined
-    - instances.results is defined
-    - item.vm is defined
+#- name: waiting for ip address to be assigned (<2.9)
+#  ovirt_nic_facts:
+#    auth: "{{ ovirt_auth }}"
+#    vm: "{{ item.vm.name }}"
+#    name: nic1
+#  register: nics
+#  until:
+#    - nics.ansible_facts.ovirt_nics | length > 0
+#    - nics.ansible_facts.ovirt_nics[0].reported_devices | length > 0
+#    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips is defined
+#    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips | length > 0
+#    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips[0].address is defined
+#    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips[0].version == 'v4'
+#  retries: 300
+#  delay: 10
+#  with_items: "{{ instances.results }}"
+#  when:
+#    - nodes is defined
+#    - instances.results is defined
+#    - item.vm is defined
 
 - name: waiting for servers to come online on predefined ip
   wait_for:
