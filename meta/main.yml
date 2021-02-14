@@ -19,4 +19,7 @@ galaxy_info:
   - ovirt
   - rhev
 
+collections:
+  - ovirt.ovirt
+
 dependencies: []
