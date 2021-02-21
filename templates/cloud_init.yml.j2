@@ -8,7 +8,6 @@ cloud_init:
   nic_boot_protocol: dhcp
 {% endif %}
   nic_name: {{ item.networks[0].nic_name | default(item.networks[0].device_name) | default('eth0') }}
-  nic_on_boot: true
   host_name: "{{ item.name }}.{{ item.domain | default('') }}"
 {% if item.dns_servers is defined %}
   dns_servers: "{{ item.dns_servers|join(' ') }}"
