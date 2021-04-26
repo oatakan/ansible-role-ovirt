@@ -20,6 +20,7 @@ galaxy_info:
   - rhev
 
 collections:
-  - ovirt.ovirt
+  - name: ovirt.ovirt
+    version: 1.4.1
 
 dependencies: []
