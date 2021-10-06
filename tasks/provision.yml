@@ -110,7 +110,7 @@
       nic_name: "{{ item.networks[0].nic_name | default(item.networks[0].device_name) | default('eth0') }}"
       nic_on_boot: true
       host_name: "{{ item.name }}.{{ item.domain | default('') }}"
-      dns_servers: "{{ item.dns_servers|join(' ') | default([]) }}"
+      dns_servers: "{{ (item.dns_servers | default([])) | join(' ') }}"
       custom_script: "{{ item.custom_script | default('') }}"
       user_name: "{{ item.user_name | default('') }}"
       root_password: "{{ item.root_password | default('') }}"
