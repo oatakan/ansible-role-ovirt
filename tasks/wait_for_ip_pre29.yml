@@ -1,25 +1,24 @@
 ---
 
-#- name: waiting for ip address to be assigned (<2.9)
-#  ovirt_nic_facts:
-#    auth: "{{ ovirt_auth }}"
-#    vm: "{{ item.vm.name }}"
-#    name: nic1
-#  register: nics
-#  until:
-#    - nics.ansible_facts.ovirt_nics | length > 0
-#    - nics.ansible_facts.ovirt_nics[0].reported_devices | length > 0
-#    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips is defined
-#    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips | length > 0
-#    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips[0].address is defined
-#    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips[0].version == 'v4'
-#  retries: 300
-#  delay: 10
-#  loop: "{{ instances.results }}"
-#  when:
-#    - nodes is defined
-#    - instances.results is defined
-#    - item.vm is defined
+- name: waiting for ip address to be assigned (<2.9)
+ ovirt_nic_facts:
+   auth: "{{ ovirt_auth }}"
+   vm: "{{ item.vm.name }}"
+   name: nic1
+ register: nics
+ until:
+   - nics.ansible_facts.ovirt_nics | length > 0
+   - nics.ansible_facts.ovirt_nics[0].reported_devices | length > 0
+   - reported_ipv4_addresses | length
+ retries: 300
+ delay: 10
+ loop: "{{ instances.results }}"
+ when:
+   - nodes is defined
+   - instances.results is defined
+   - item.vm is defined
+ vars:
+    reported_ipv4_addresses: "{{ (nics.ovirt_nics[0].reported_devices | json_query('[*].ips[?version==`v4`].address') | flatten) | default([]) }}"
 
 - name: waiting for servers to come online on predefined ip
   wait_for:
@@ -55,10 +54,7 @@
   until:
     - nics.ansible_facts.ovirt_nics | length > 0
     - nics.ansible_facts.ovirt_nics[0].reported_devices | length > 0
-    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips | length > 0
-    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips[0].address is defined
-    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips[0].version == 'v4'
-    - nics.ansible_facts.ovirt_nics[0].reported_devices[0].ips[0].address == item.networks[0].ip
+    - item.networks[0].ip in reported_ipv4_addresses
   retries: "{{ ip_wait_retry_limit }}"
   delay: 10
   loop: "{{ nodes }}"
@@ -67,3 +63,5 @@
     - nodes is defined
     - item.networks | length > 0
     - item.networks[0].ip is defined
+  vars:
+    reported_ipv4_addresses: "{{ (nics.ovirt_nics[0].reported_devices | json_query('[*].ips[?version==`v4`].address') | flatten) | default([]) }}"
