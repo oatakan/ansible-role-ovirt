@@ -18,7 +18,7 @@
    - instances.results is defined
    - item.vm is defined
  vars:
-    reported_ipv4_addresses: "{{ (nics.ovirt_nics[0].reported_devices | json_query('[*].ips[?version==`v4`].address') | flatten) | default([]) }}"
+   reported_ipv4_addresses: "{{ (nics.ovirt_nics[0].reported_devices | json_query('[*].ips[?version==`v4`].address') | flatten) | default([]) }}"
 
 - name: waiting for servers to come online on predefined ip
   wait_for:
