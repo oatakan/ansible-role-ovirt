@@ -5,6 +5,9 @@
     auth: "{{ ovirt_auth }}"
     vm: "{{ item.vm.name }}"
     name: nic1
+    fetch_nested: yes
+    nested_attributes:
+      - ips
   register: nics
   until:
     - nics.ovirt_nics | length > 0
