@@ -13,6 +13,7 @@
     - nics.ovirt_nics | length > 0
     - nics.ovirt_nics[0].reported_devices | length > 0
     - reported_ipv4_addresses | length
+    - not (reported_ipv4_addresses[0] | regex_search('^169\.254\..*'))
   retries: 300
   delay: 10
   loop: "{{ instances.results }}"
