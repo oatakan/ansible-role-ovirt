@@ -47,7 +47,7 @@
   until: deployed_instances.finished
   retries: "{{ instance_wait_retry_limit }}"
   delay: 10
-  no_log: true
+#   no_log: true
   loop: "{{ deploy.results }}"
   when:
     - nodes is defined
