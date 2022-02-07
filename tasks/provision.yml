@@ -164,6 +164,7 @@
 
 - name: assign tags to provisioned vms
   ovirt_tag:
+    auth: "{{ ovirt_auth }}"
     name: "{{ item.1 }}_{{ item.0.item.item[item.1] }}"
     vms: ["{{ item.0.item.item.name }}"]
     state: attached
