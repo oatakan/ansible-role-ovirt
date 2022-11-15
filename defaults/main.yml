@@ -15,3 +15,5 @@ ip_wait_retry_limit: 600
 
 wait_for_static_ip_assigned: yes
 
+ovirt_pre_2_10_invalid_options:
+  - bios_type

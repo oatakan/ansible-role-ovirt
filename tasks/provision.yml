@@ -18,7 +18,7 @@
     cpu_sockets: "{{ item.cpu }}"
     cpu_threads: "{{ item.cpu_threads | default(omit) }}"
     cd_iso: "{{ node_iso_file[item] | default(omit) }}"
-    bios_type: "{{ item.bios_type | default(omit) }}"
+    bios_type: "{{ omit if ('bios_type' in ovirt_invalid_options or item.bios_type is undefined) else item.bios_type }}"
     ballooning_enabled: "{{ item.ballooning_enabled | default(omit) }}"
     graphical_console: "{{ item.graphical_console | default(omit) }}"
     host: "{{ item.host | default(omit) }}"
