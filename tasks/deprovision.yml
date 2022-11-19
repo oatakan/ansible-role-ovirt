@@ -59,7 +59,9 @@
   retries: "{{ instance_wait_retry_limit }}"
   delay: 10
   loop: "{{ delete_disks.results }}"
+  failed_when:
   when:
     - nodes is defined
     - delete_disks.results is defined
     - item.ansible_job_id is defined
+  ignore_errors: true
