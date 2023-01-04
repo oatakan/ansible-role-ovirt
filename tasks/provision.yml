@@ -108,7 +108,7 @@
       nic_netmask: "{{ item.networks[0].netmask | default('') }}"
       nic_gateway: "{{ item.networks[0].gateway | default('') }}"
       nic_name: "{{ item.networks[0].nic_name | default(item.networks[0].device_name) | default('eth0') }}"
-      nic_on_boot: "{{ true if ansible_version.full is version('2.10', '<') else omit }}"
+      nic_on_boot: "{{ true if ansible_version.full is version('2.9', '<') else omit }}"
       host_name: "{{ item.name }}.{{ item.domain | default('') }}"
       dns_servers: "{{ (item.dns_servers | default([])) | join(' ') }}"
       custom_script: "{{ item.custom_script | default('') }}"
