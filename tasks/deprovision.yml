@@ -47,7 +47,6 @@
   when:
     - nodes is defined
     - item.1 is defined
-    - item.1 | length
     - item.1.storage_domain is defined
   vars:
     query: "@[?contains(`{{ ansible_play_hosts }}`, name)]"
