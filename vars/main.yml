@@ -5,4 +5,4 @@ set_network_to_private: "([Activator]::CreateInstance([Type]::GetTypeFromCLSID([
 
 ovirt_invalid_options: "{{ ovirt_pre_2_10_invalid_options if (ansible_version.full is version('2.10', '<')) else [] }}"
 
-ovirt_additional_disk_name: "{{ item.0.name + '_' if ((item.1.name_prefix|bool) | default(true)) else '' }}{{ item.1.name }}"
+ovirt_additional_disk_name: "{{ item.0.name + '_' if (((item.1.name_prefix) | default(true)) | bool) else '' }}{{ item.1.name }}"
