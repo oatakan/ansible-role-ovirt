@@ -14,6 +14,7 @@ instance_wait_connection_timeout: 300
 ip_wait_retry_limit: 600
 
 wait_for_static_ip_assigned: yes
+wait_for_ip_timeout: 300
 
 ovirt_pre_2_10_invalid_options:
   - bios_type
