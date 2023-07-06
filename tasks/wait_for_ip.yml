@@ -49,7 +49,7 @@
   when:
     - nodes is defined
     - nics.results is defined
-    - item.ovirt_nics is defined
+    - nic.ovirt_nics is defined
     - node.networks is defined
     - node.networks[0].ip is not defined
 
