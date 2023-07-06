@@ -38,7 +38,7 @@
 
 - name: waiting for servers to come online on dhcp ip
   ansible.builtin.wait_for:
-    host: "{{ (item.ovirt_nics[0].reported_devices | json_query('[*].ips[?version==`v4`].address'))[0][0] | default('') }}"
+    host: "{{ (nic.ovirt_nics[0].reported_devices | json_query('[*].ips[?version==`v4`].address'))[0][0] | default('') }}"
     port: "{{ node.ansible_port | default(_ansible_port) | default('22') }}"
     timeout: "{{ wait_for_ip_timeout }}"
   loop: "{{ nics.results }}"
