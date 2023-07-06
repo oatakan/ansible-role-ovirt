@@ -7,4 +7,4 @@ ovirt_invalid_options: "{{ ovirt_pre_2_10_invalid_options if (ansible_version.fu
 
 ovirt_additional_disk_name: "{{ item.0.name + '_' if (((item.1.name_prefix) | default(true)) | bool) else '' }}{{ item.1.name }}"
 
-_ansible_port: "{{ 5986 if (item.sysprep is defined and item.sysprep | bool) else ansible_port }}"
+_ansible_port: "{{ 5986 if (node.sysprep is defined and node.sysprep | bool) else ansible_port }}"
