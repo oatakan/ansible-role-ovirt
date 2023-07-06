@@ -1,5 +1,7 @@
 ---
-- hosts: localhost
+
+- name: provision
+  hosts: localhost
   remote_user: root
   roles:
     - ansible-role-ovirt

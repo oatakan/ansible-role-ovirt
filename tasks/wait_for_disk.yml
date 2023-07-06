@@ -1,7 +1,7 @@
 ---
 
 - name: wait until the image is unlocked by the oVirt engine
-  ovirt_disk_info:
+  ovirt.ovirt.ovirt_disk_info:
     auth: "{{ ovirt_auth }}"
     pattern: "name={{ ovirt_additional_disk_name }}"
   register: ovirt_disk_info
@@ -11,7 +11,7 @@
   with_subelements:
     - "{{ nodes }}"
     - disks
-    - skip_missing: yes
+    - skip_missing: true
   when:
     - nodes is defined
     - disks_creation.results is defined

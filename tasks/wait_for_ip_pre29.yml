@@ -50,7 +50,7 @@
     auth: "{{ ovirt_auth }}"
     vm: "{{ item.name }}"
     name: nic1
-    fetch_nested: yes
+    fetch_nested: true
     nested_attributes:
       - ips
   register: nics

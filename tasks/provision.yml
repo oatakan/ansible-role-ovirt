@@ -1,15 +1,16 @@
 ---
 
-- include_tasks: preflight_check.yml
+- name: preflight check
+  ansible.builtin.include_tasks: preflight_check.yml
 
 - name: clone from template
-  ovirt_vm:
+  ovirt.ovirt.ovirt_vm:
     auth: "{{ ovirt_auth }}"
     name: "{{ item.name }}"
     template: "{{ item.template | default(omit) }}"
     cluster: "{{ providers.ovirt.cluster | default('Default') }}"
     state: present
-    wait: yes
+    wait: true
     memory: "{{ item.memory }}MiB"
     memory_max: "{{ ((item.memory_max | string) + 'MiB') if item.memory_max is defined else omit }}"
     memory_guaranteed: "{{ ((item.memory_guaranteed | string) + 'MiB') if item.memory_guaranteed is defined else omit }}"
@@ -41,7 +42,7 @@
     - nodes is defined
 
 - name: wait for instance creation to complete
-  async_status:
+  ansible.builtin.async_status:
     jid: "{{ item.ansible_job_id }}"
   register: deployed_instances
   until: deployed_instances.finished
@@ -55,7 +56,7 @@
     - item.ansible_job_id is defined
 
 - name: create additional disks
-  ovirt_disk:
+  ovirt.ovirt.ovirt_disk:
     auth: "{{ ovirt_auth }}"
     name: "{{ ovirt_additional_disk_name }}"
     vm_name: "{{ item.0.name }}"
@@ -64,22 +65,22 @@
     interface: "{{ item.1.interface | default(omit) }}"
     bootable: "{{ item.1.bootable | default(omit) }}"
     storage_domain: "{{ item.1.storage_domain | default(omit) }}"
-    activate: yes
+    activate: true
     state: present
-    wait: yes
+    wait: true
   async: 7200
   poll: 0
   register: create_disks
   with_subelements:
     - "{{ nodes }}"
     - disks
-    - skip_missing: yes
+    - skip_missing: true
   when:
     - nodes is defined
     - item.1 is defined
 
 - name: wait for disk creation to complete
-  async_status:
+  ansible.builtin.async_status:
     jid: "{{ item.ansible_job_id }}"
   register: disks_creation
   until: disks_creation.finished
@@ -91,14 +92,16 @@
     - create_disks.results is defined
     - item.ansible_job_id is defined
 
-- include_tasks: wait_for_disk_pre29.yml
+- name: wait for disk (pre29)
+  ansible.builtin.include_tasks: wait_for_disk_pre29.yml
   when: ansible_version.full is version('2.9', '<')
 
-- include_tasks: wait_for_disk.yml
+- name: wait for disk
+  ansible.builtin.include_tasks: wait_for_disk.yml
   when: ansible_version.full is version('2.9', '>=')
 
 - name: linux - start and customize
-  ovirt_vm:
+  ovirt.ovirt.ovirt_vm:
     auth: "{{ ovirt_auth }}"
     name: "{{ item.name }}"
     state: running
@@ -123,7 +126,7 @@
     - item.sysprep is not defined
 
 - name: windows - start and customize
-  ovirt_vm:
+  ovirt.ovirt.ovirt_vm:
     auth: "{{ ovirt_auth }}"
     name: "{{ item.name }}"
     state: running
@@ -142,15 +145,15 @@
     - item.sysprep is defined
 
 - name: combine deployment results
-  set_fact:
-    deploy_results: "{{ deploy_results|default([]) + [ item ] }}"
+  ansible.builtin.set_fact:
+    deploy_results: "{{ deploy_results | default([]) + [item] }}"
   loop: "{{ deploy_linux.results + deploy_windows.results }}"
   when:
     - nodes is defined
     - item.ansible_job_id is defined
 
 - name: wait for vms to be started
-  async_status:
+  ansible.builtin.async_status:
     jid: "{{ item.ansible_job_id }}"
   register: instances
   until: instances.finished
@@ -163,22 +166,24 @@
     - item.ansible_job_id is defined
 
 - name: assign tags to provisioned vms
-  ovirt_tag:
+  ovirt.ovirt.ovirt_tag:
     auth: "{{ ovirt_auth }}"
     name: "{{ item.1 }}_{{ item.0.item.item[item.1] }}"
     vms: ["{{ item.0.item.item.name }}"]
     state: attached
   with_nested:
     - "{{ instances.results }}"
-    - [ 'app_name', 'role' ]
+    - ['app_name', 'role']
   when:
     - nodes is defined
     - instances.results is defined
     - item.0.vm is defined
     - item.0.item.item[item.1] is defined
 
-- include_tasks: wait_for_ip_pre29.yml
+- name: wait for ip (pre29)
+  ansible.builtin.include_tasks: wait_for_ip_pre29.yml
   when: ansible_version.full is version('2.9', '<')
 
-- include_tasks: wait_for_ip.yml
+- name: wait for ip
+  ansible.builtin.include_tasks: wait_for_ip.yml
   when: ansible_version.full is version('2.9', '>=')

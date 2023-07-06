@@ -1,13 +1,13 @@
 ---
 
 - name: remove vms
-  ovirt_vm:
+  ovirt.ovirt.ovirt_vm:
     auth: "{{ ovirt_auth }}"
     name: "{{ item }}"
     cluster: "{{ providers.ovirt.cluster | default('Default') }}"
     storage_domain: "{{ item.storage_domain | default(omit) }}"
     state: absent
-    wait: yes
+    wait: true
   async: 7200
   poll: 0
   register: undeploy
@@ -17,7 +17,7 @@
     - hostvars[item].name is defined
 
 - name: wait for vms to be deleted
-  async_status:
+  ansible.builtin.async_status:
     jid: "{{ item.ansible_job_id }}"
   register: vm_remove
   until: vm_remove.finished
@@ -30,20 +30,20 @@
     - item.ansible_job_id is defined
 
 - name: delete additional disks
-  ovirt_disk:
+  ovirt.ovirt.ovirt_disk:
     auth: "{{ ovirt_auth }}"
     name: "{{ ovirt_additional_disk_name }}"
     vm_name: "{{ item.0.name }}"
     storage_domain: "{{ item.1.storage_domain | default(omit) }}"
     state: absent
-    wait: no
+    wait: false
   async: 7200
   poll: 0
   register: delete_disks
   with_subelements:
     - "{{ nodes | json_query(query) }}"
     - disks
-    - skip_missing: yes
+    - skip_missing: true
   when:
     - nodes is defined
     - item.1 is defined
@@ -52,7 +52,7 @@
     query: "@[?contains(`{{ ansible_play_hosts }}`, name)]"
 
 - name: wait for disk deletion to complete
-  async_status:
+  ansible.builtin.async_status:
     jid: "{{ item.ansible_job_id }}"
   register: disks_deletion
   until: disks_deletion.finished

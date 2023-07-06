@@ -1,0 +1,8 @@
+skip_list:
+  - 'experimental'
+  - 'key-order[task]'
+  - 'name[casing]'
+  - 'ignore-errors'
+  - 'role-name'
+  - 'jinja[invalid]'
+  - 'yaml[line-length]'

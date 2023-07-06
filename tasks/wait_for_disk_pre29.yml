@@ -10,7 +10,7 @@
   with_subelements:
     - "{{ nodes }}"
     - disks
-    - skip_missing: yes
+    - skip_missing: true
   when:
     - nodes is defined
     - disks_creation.results is defined

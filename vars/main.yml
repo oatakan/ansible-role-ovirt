@@ -1,6 +1,6 @@
 ---
 
-win_os_c_drive_partition: "{{ '4' if (item.efi is defined and item.efi|bool) else '2' }}"
+win_os_c_drive_partition: "{{ '4' if (item.efi is defined and item.efi | bool) else '2' }}"
 set_network_to_private: "([Activator]::CreateInstance([Type]::GetTypeFromCLSID([Guid]'{DCB00C01-570F-4A9B-8D69-199FDBA5723B}'))).GetNetworkConnections() | % {$_.GetNetwork().SetCategory(1)}"
 
 ovirt_invalid_options: "{{ ovirt_pre_2_10_invalid_options if (ansible_version.full is version('2.10', '<')) else [] }}"
