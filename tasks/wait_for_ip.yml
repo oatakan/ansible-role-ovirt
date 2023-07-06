@@ -26,7 +26,7 @@
 - name: waiting for servers to come online on predefined ip
   ansible.builtin.wait_for:
     host: "{{ item.networks[0].ip }}"
-    port: "{{ item.ansible_port | default(ansible_port) | default('22') }}"
+    port: "{{ item.ansible_port | default(_ansible_port) | default('22') }}"
     timeout: "{{ wait_for_ip_timeout }}"
   loop: "{{ nodes }}"
   when:
@@ -37,7 +37,7 @@
 - name: waiting for servers to come online on dhcp ip
   ansible.builtin.wait_for:
     host: "{{ (item.ovirt_nics[0].reported_devices | json_query('[*].ips[?version==`v4`].address'))[0][0] | default('') }}"
-    port: "{{ item.item.item.item.ansible_port | default(ansible_port) | default('22') }}"
+    port: "{{ item.item.item.item.ansible_port | default(_ansible_port) | default('22') }}"
     timeout: "{{ wait_for_ip_timeout }}"
   loop: "{{ nics.results }}"
   when:
