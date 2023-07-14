@@ -18,3 +18,5 @@ wait_for_ip_timeout: 300
 
 ovirt_pre_2_10_invalid_options:
   - bios_type
+
+winrm_enable_script_url: https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1
