@@ -3,16 +3,17 @@
 - name: wait until the image is unlocked by the oVirt engine
   ovirt.ovirt.ovirt_disk_info:
     auth: "{{ ovirt_auth }}"
-    pattern: "name={{ ovirt_additional_disk_name }}"
+    pattern: "name={{ _disk_name }}"
   register: ovirt_disk_info
   until: (ovirt_disk_info.ovirt_disks is defined) and (ovirt_disk_info.ovirt_disks | length > 0) and (ovirt_disk_info.ovirt_disks[0].status != "locked")
   retries: 10
   delay: 3
-  with_subelements:
-    - "{{ nodes }}"
-    - disks
-    - skip_missing: true
+  loop: "{{ q('subelements', _vm_info_combined, 'node.disks', {'skip_missing': True, 'return_index': True}) }}"
   when:
     - nodes is defined
     - disks_creation.results is defined
-    - item.1 is defined
+  vars:
+    _vm_name: "{{ item.0.1.ovirt_vm.name }}"
+    _disk_idx: "{{ item.1.0 }}"
+    _disk_auto_name: "{{ _vm_name }}_disk{{ _disk_idx | string }}"
+    _disk_name: "{{ item.1.1.name | default(_disk_auto_name) }}"

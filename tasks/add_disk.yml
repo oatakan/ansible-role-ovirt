@@ -1,0 +1,87 @@
+---
+
+- include_tasks: vm_info.yml
+
+- name: update existing disks
+  ovirt.ovirt.ovirt_disk:
+    auth: "{{ ovirt_auth }}"
+    id: "{{ _disk_id }}"
+    name: "{{ _disk_name if (_disk_rename) else omit }}"
+    vm_name: "{{ _vm_name }}"
+    size: "{{ _disk_size | default(omit) }}"
+    format: "{{ _disk_format | default(omit) }}"
+    interface: "{{ _disk_interface | default(omit) }}"
+    bootable: "{{ _disk_bootable | default(omit) }}"
+    storage_domain: "{{ _disk_storage_domain | default(omit) }}"
+    activate: true
+    state: present
+    wait: true
+  loop: "{{ q('subelements', _vm_info_combined, 'ovirt_vm.disk_attachments', {'skip_missing': True, 'return_index': True}) }}"
+  when:
+    - _vm_info_combined is defined
+  vars:
+    _vm_name: "{{ item.0.1.ovirt_vm.name }}"
+    _disk_idx: "{{ item.1.0 }}"
+    _disk_id: "{{ item.1.1.id }}"
+    _disk_auto_name: "{{ _vm_name }}_disk{{ _disk_idx | string }}"
+    _disk_name: "{{ item.0.1.node.disks[_disk_idx|int].name | default(_disk_auto_name) }}"
+    _disk_size: "{{ item.0.1.node.disks[_disk_idx|int].size }}"
+    _disk_storage_domain: "{{ item.0.1.node.disks[_disk_idx|int].storage_domain }}"
+    _disk_interface: "{{ item.0.1.node.disks[_disk_idx|int].interface }}"
+    _disk_bootable: "{{ item.0.1.node.disks[_disk_idx|int].bootable }}"
+    _disk_format: "{{ item.0.1.node.disks[_disk_idx|int].format }}"
+    _disk_rename: "{{ true if (ovirt_disk_auto_rename or _disk_name is defined) else false }}"
+
+- name: create any additional disks
+  ovirt.ovirt.ovirt_disk:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ _disk_name if (_disk_rename) else omit }}"
+    vm_name: "{{ _vm_name }}"
+    size: "{{ _disk_size | default(omit) }}"
+    format: "{{ _disk_format | default(omit) }}"
+    interface: "{{ _disk_interface | default(omit) }}"
+    bootable: "{{ _disk_bootable | default(omit) }}"
+    storage_domain: "{{ _disk_storage_domain | default(omit) }}"
+    activate: true
+    state: present
+    wait: true
+  async: 7200
+  poll: 0
+  register: create_disks
+  loop: "{{ q('subelements', _vm_info_combined, 'node.disks', {'skip_missing': True, 'return_index': True})[(_start_idx|int):] }}"
+  when:
+    - _vm_info_combined is defined
+    - ((_vm_info_combined[item.0.0].node.disks | default([])) | length) > ((item.0.1.ovirt_vm.disk_attachments | default([])) | length)
+  vars:
+    _start_idx: '{{ ((_vm_info_combined[item.0.0].ovirt_vm.disk_attachments | default([])) | length) }}' # we don't work on existing disks
+    _vm_name: "{{ item.0.1.ovirt_vm.name }}"
+    _disk_idx: "{{ item.1.0 }}"
+    _disk_auto_name: "{{ _vm_name }}_disk{{ _disk_idx | string }}"
+    _disk_name: "{{ item.1.1.name | default(_disk_auto_name) }}"
+    _disk_size: "{{ item.1.1.size }}"
+    _disk_storage_domain: "{{ item.1.1.storage_domain }}"
+    _disk_interface: "{{ item.1.1.interface }}"
+    _disk_bootable: "{{ item.1.1.bootable }}"
+    _disk_format: "{{ item.1.1.format }}"
+    _disk_rename: true
+
+- name: wait for disk creation to complete
+  ansible.builtin.async_status:
+    jid: "{{ item.ansible_job_id }}"
+  register: disks_creation
+  until: disks_creation.finished
+  retries: "{{ instance_wait_retry_limit }}"
+  delay: 10
+  loop: "{{ create_disks.results }}"
+  when:
+    - nodes is defined
+    - create_disks.results is defined
+    - item.ansible_job_id is defined
+
+- name: wait for disk (pre29)
+  ansible.builtin.include_tasks: wait_for_disk_pre29.yml
+  when: ansible_version.full is version('2.9', '<')
+
+- name: wait for disk
+  ansible.builtin.include_tasks: wait_for_disk.yml
+  when: ansible_version.full is version('2.9', '>=')

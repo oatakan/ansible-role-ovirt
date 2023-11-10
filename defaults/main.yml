@@ -20,3 +20,5 @@ ovirt_pre_2_10_invalid_options:
   - bios_type
 
 winrm_enable_script_url: https://raw.githubusercontent.com/ansible/ansible-documentation/devel/examples/scripts/ConfigureRemotingForAnsible.ps1
+
+ovirt_disk_auto_rename: true # requires ovirt engine >=4.4

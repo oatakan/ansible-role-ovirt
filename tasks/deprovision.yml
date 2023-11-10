@@ -1,5 +1,7 @@
 ---
 
+- include_tasks: vm_info.yml
+
 - name: remove vms
   ovirt.ovirt.ovirt_vm:
     auth: "{{ ovirt_auth }}"
@@ -29,27 +31,20 @@
     - undeploy.results is defined
     - item.ansible_job_id is defined
 
-- name: delete additional disks
+- name: delete any additional disks
   ovirt.ovirt.ovirt_disk:
     auth: "{{ ovirt_auth }}"
-    name: "{{ ovirt_additional_disk_name }}"
-    vm_name: "{{ item.0.name }}"
-    storage_domain: "{{ item.1.storage_domain | default(omit) }}"
+    id: "{{ _disk_id }}"
     state: absent
     wait: false
   async: 7200
   poll: 0
   register: delete_disks
-  with_subelements:
-    - "{{ nodes | json_query(query) }}"
-    - disks
-    - skip_missing: true
-  when:
-    - nodes is defined
-    - item.1 is defined
-    - item.1.storage_domain is defined
+  loop: "{{ q('subelements', _vm_info_combined, 'ovirt_vm.disk_attachments', {'skip_missing': True}) }}"
+  when: not (_bootable | bool)
   vars:
-    query: "@[?contains(`{{ ansible_play_hosts }}`, name)]"
+    _disk_id: "{{ item.1.id }}"
+    _bootable: "{{ item.1.bootable }}"
 
 - name: wait for disk deletion to complete
   ansible.builtin.async_status:

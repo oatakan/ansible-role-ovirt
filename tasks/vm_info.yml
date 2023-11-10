@@ -1,0 +1,25 @@
+---
+
+- name: get existing vm disks info
+  ovirt.ovirt.ovirt_vm_info:
+    auth: "{{ ovirt_auth }}"
+    follow:
+      - disk_attachments
+      - disk_attachments.disk
+    pattern: name="{{ item.name }}"
+  register: vm_disk_info
+  loop: "{{ nodes }}"
+  when:
+    - nodes is defined
+
+- name: clear vm info
+  set_fact:
+    _vm_info_combined: []
+
+- name: set vm info
+  set_fact:
+    _vm_info_combined: "{{ _vm_info_combined + [_vm_info] }}"
+  loop: "{{ vm_disk_info.results }}"
+  vars:
+    _vm_info: "{{ {'node': item.item} | combine({'ovirt_vm': item.ovirt_vms[0]}) }}"
+  when: item.ovirt_vms | length
